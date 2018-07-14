@@ -5,6 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -22,23 +26,31 @@ public class SlideBar extends View {
     };
 
     private OnLetterTouchListener listener;
-    private int textSize = 40;
-    private int textColor = Color.BLACK;
-    private int textTouchedColor = Color.YELLOW;
-    private int bgColor = Color.LTGRAY;
+    private int mTextSize = 40;
+    private int mTextColor = R.color.colorPrimary;
+    private int mTextTouchedColor = R.color.colorAccent;
+    private int mTouchedBgColor = Color.LTGRAY;
     private boolean showBg = false;
-    private int currentLetterIndex = -1;
+    private int mCurrentLetterIndex = -1;
     private Paint paint = new Paint();
-    private TextView letterTv = null;
+    private TextView mLetterTv = null;
+    private int mBackgroundDrawableResource;
+    private Context mContext;
+    private Drawable mTouchedBgDrawable;
+    private boolean hasTouchedDrawable;
     private int barWidth;
     private int singleHeight;
 
     public SlideBar(Context context) {
         super(context);
+        mContext = context;
+
     }
 
     public SlideBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
+
     }
 
     public SlideBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -68,28 +80,40 @@ public class SlideBar extends View {
     }
 
     public void setTextView(TextView textView) {
-        letterTv = textView;
+        mLetterTv = textView;
     }
 
     public void setLetterTv(TextView tv) {
-        letterTv = tv;
+        mLetterTv = tv;
     }
 
-    public void setTextColor(int color) {
-        textColor = color;
+
+    public void setTextColor(@ColorRes int colorRes) {
+        mTextColor = colorRes;
     }
 
-    public void setTextTouchedColor(int textTouchedColor) {
-        this.textTouchedColor = textTouchedColor;
+    public void setTextTouchedColor(@ColorRes  int textTouchedColor) {
+        this.mTextTouchedColor = textTouchedColor;
     }
 
-    public void setTextSize(int textSize) {
-        this.textSize = textSize;
+    public void settextSize(int textSize) {
+        this.mTextSize = textSize;
     }
 
-    @Override
-    public void setBackgroundColor(int bgColor) {
-        this.bgColor = bgColor;
+    public void setTouchedBackgroundColor(@ColorInt int bgColor) {
+        this.mTouchedBgColor = bgColor;
+    }
+
+    public void setTouchedBackgroundDrawableResource(@DrawableRes int resid) {
+        if (resid != 0 && resid == mBackgroundDrawableResource) {
+            return;
+        }
+
+        if (resid != 0) {
+            mTouchedBgDrawable = mContext.getResources().getDrawable((resid));
+        }
+        hasTouchedDrawable = true;
+        mBackgroundDrawableResource = resid;
     }
 
     @Override
@@ -97,20 +121,25 @@ public class SlideBar extends View {
         super.onDraw(canvas);
 
         if (showBg) {
-            canvas.drawColor(bgColor);
+            if (hasTouchedDrawable) {
+                setBackground(mTouchedBgDrawable);
+            } else {
+                canvas.drawColor(mTouchedBgColor);
+            }
+        } else {
+            if (hasTouchedDrawable) {
+                setBackground(null);
+            }
         }
 
-        paint.setAntiAlias(true);
-        paint.setTextSize(textSize);
-
         for (int i = 0; i < letters.length; i++) {
-            paint.setTextSize(textSize);
+            paint.setTextSize(mTextSize);
 
-            if (currentLetterIndex == i) {
-                paint.setColor(textTouchedColor);
+            if (mCurrentLetterIndex == i) {
+                paint.setColor(getResources().getColor(mTextTouchedColor));
                 paint.setFakeBoldText(true);
             } else {
-                paint.setColor(textColor);
+                paint.setColor(getResources().getColor(mTextColor));
                 paint.setTypeface(Typeface.DEFAULT_BOLD);
             }
 
@@ -126,7 +155,7 @@ public class SlideBar extends View {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        int lastIndex = currentLetterIndex;
+        int lastIndex = mCurrentLetterIndex;
         float y = event.getY();
         int currentTouchIndex = (int) (y / getHeight() * letters.length);
 
@@ -134,11 +163,11 @@ public class SlideBar extends View {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_UP:
                     showBg = false;
-                    currentLetterIndex = -1;
+                    mCurrentLetterIndex = -1;
                     invalidate();
 
-                    if (letterTv != null) {
-                        letterTv.setVisibility(GONE);
+                    if (mLetterTv != null) {
+                        mLetterTv.setVisibility(GONE);
                     }
                     break;
                 case MotionEvent.ACTION_DOWN:
@@ -148,12 +177,12 @@ public class SlideBar extends View {
                             && currentTouchIndex >= 0 && currentTouchIndex < letters.length) {
                         listener.onTouchListener(letters[currentTouchIndex],currentTouchIndex);
 
-                        if (letterTv != null) {
-                            letterTv.setText(letters[currentTouchIndex]);
-                            letterTv.setVisibility(VISIBLE);
+                        if (mLetterTv != null) {
+                            mLetterTv.setText(letters[currentTouchIndex]);
+                            mLetterTv.setVisibility(VISIBLE);
                         }
 
-                        currentLetterIndex = currentTouchIndex;
+                        mCurrentLetterIndex = currentTouchIndex;
                         invalidate();
                     }
                     break;
