@@ -169,6 +169,7 @@ public class SlideBar extends View {
          * 对侧边栏触摸事件进行监听
          *
          * @param letter 当前触摸的索引字母
+         * @param position 当前触摸的位置
          */
         void onTouchListener(String letter,int position);
     }
