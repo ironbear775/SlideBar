@@ -1,8 +1,6 @@
 package com.ironbear775.slidebar;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
