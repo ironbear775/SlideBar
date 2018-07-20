@@ -1,5 +1,4 @@
 package com.ironbear775.slidebar;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -17,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         SlideBar slideBar = findViewById(R.id.slide_bar);
         slideBar.setTextView(textView);
         slideBar.setTextColor(R.color.colorAccent);
-        slideBar.setTouchedBackgroundColor(Color.BLUE);
+        slideBar.setTextTouchedColor(R.color.colorPrimary);
         slideBar.setOnLetterTouchListener(new SlideBar.OnLetterTouchListener() {
             @Override
             public void onTouchListener(String letter,int position) {
@@ -25,5 +24,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }

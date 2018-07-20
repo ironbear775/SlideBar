@@ -3,13 +3,13 @@ package com.ironbear775.slidebar;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +32,7 @@ public class SlideBar extends View {
     private int mTouchedBgColor = Color.LTGRAY;
     private boolean showBg = false;
     private int mCurrentLetterIndex = -1;
-    private Paint paint = new Paint();
+    private TextPaint paint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
     private TextView mLetterTv = null;
     private int mBackgroundDrawableResource;
     private Context mContext;
@@ -40,6 +40,7 @@ public class SlideBar extends View {
     private boolean hasTouchedDrawable;
     private int barWidth;
     private int singleHeight;
+    private Typeface mTypeface = Typeface.DEFAULT;
 
     public SlideBar(Context context) {
         super(context);
@@ -61,6 +62,10 @@ public class SlideBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         init();
+    }
+
+    public void setTypeface(Typeface typeface) {
+        this.mTypeface = typeface;
     }
 
     private void init() {
@@ -92,11 +97,11 @@ public class SlideBar extends View {
         mTextColor = colorRes;
     }
 
-    public void setTextTouchedColor(@ColorRes  int textTouchedColor) {
+    public void setTextTouchedColor(@ColorRes int textTouchedColor) {
         this.mTextTouchedColor = textTouchedColor;
     }
 
-    public void settextSize(int textSize) {
+    public void setTextSize(int textSize) {
         this.mTextSize = textSize;
     }
 
@@ -104,16 +109,16 @@ public class SlideBar extends View {
         this.mTouchedBgColor = bgColor;
     }
 
-    public void setTouchedBackgroundDrawableResource(@DrawableRes int resid) {
-        if (resid != 0 && resid == mBackgroundDrawableResource) {
+    public void setTouchedBackgroundDrawableResource(@DrawableRes int resId) {
+        if (resId != 0 && resId == mBackgroundDrawableResource) {
             return;
         }
 
-        if (resid != 0) {
-            mTouchedBgDrawable = mContext.getResources().getDrawable((resid));
+        if (resId != 0) {
+            mTouchedBgDrawable = mContext.getResources().getDrawable((resId));
         }
         hasTouchedDrawable = true;
-        mBackgroundDrawableResource = resid;
+        mBackgroundDrawableResource = resId;
     }
 
     @Override
@@ -133,6 +138,8 @@ public class SlideBar extends View {
         }
 
         for (int i = 0; i < letters.length; i++) {
+
+            paint.setAntiAlias(true);
             paint.setTextSize(mTextSize);
 
             if (mCurrentLetterIndex == i) {
@@ -140,7 +147,7 @@ public class SlideBar extends View {
                 paint.setFakeBoldText(true);
             } else {
                 paint.setColor(getResources().getColor(mTextColor));
-                paint.setTypeface(Typeface.DEFAULT_BOLD);
+                paint.setTypeface(mTypeface);
             }
 
             //计算每个字母需要绘制的所在的位置
@@ -175,7 +182,7 @@ public class SlideBar extends View {
                     showBg = true;
                     if (currentTouchIndex != lastIndex
                             && currentTouchIndex >= 0 && currentTouchIndex < letters.length) {
-                        listener.onTouchListener(letters[currentTouchIndex],currentTouchIndex);
+                        listener.onTouchListener(letters[currentTouchIndex], currentTouchIndex);
 
                         if (mLetterTv != null) {
                             mLetterTv.setText(letters[currentTouchIndex]);
@@ -197,10 +204,10 @@ public class SlideBar extends View {
         /**
          * 对侧边栏触摸事件进行监听
          *
-         * @param letter 当前触摸的索引字母
+         * @param letter   当前触摸的索引字母
          * @param position 当前触摸的位置
          */
-        void onTouchListener(String letter,int position);
+        void onTouchListener(String letter, int position);
     }
 
 
